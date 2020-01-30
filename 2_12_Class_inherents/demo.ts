@@ -17,6 +17,8 @@ class Teacher extends Person {
 // 多太：
 class Teacher1 extends Person {
   getName() {
+    // 重写之后依然可以用 super 去调用父类中的方法
+    // return super.getName() + ' lee'; / dell lee
     return 'lee';
   }
   getParentName() {
