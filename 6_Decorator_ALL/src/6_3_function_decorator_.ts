@@ -7,7 +7,7 @@ function getNameDecorator(
   key: string,
   descriptor: PropertyDescriptor
 ) {
-  // console.log(target, key); // Test3 { getName: [Function] } 'getName'
+  // console.log(target, key); // Test3 { getName: [Functio n] } 'getName'
   // descriptor.writable = false; // 这样 getName 这个方法就不能够被修改
 
   // 提前修改 getName 这个方法
