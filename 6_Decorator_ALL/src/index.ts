@@ -1,57 +1,43 @@
 import 'reflect-metadata';
 
-// const user = {
-//   name: 'dell'
-// };
-
-// reflect-metadata 可以在类上储存一些数据
-// defineMetadata 有三个参数， Key: data, value: test, target obj: user
-// Reflect.defineMetadata('data', 'test', user);
-// console.log(Reflect.getMetadata('data', user)); // test
-
-// 定义在类上
-// @Reflect.metadata('data', 'test')
-// class User {
-//   name = 'dell';
-// }
-
-// 定义在属性上
-// class User {
-//   @Reflect.metadata('data', 'test')
-//   name = 'dell';
-// }
-
-// console.log(Reflect.getMetadata('data', User.prototype, 'name')); // test
-
-// 定义在方法上
-
-class User {
-  @Reflect.metadata('data', 'test')
-  @Reflect.metadata('data1', 'test')
-  getName() {}
+// 接收到的函数是 constructor 可以用 typeof User 表示：
+function showData(target: typeof User) {
+  // key 为 User 类上的所有方法
+  for (let key in target.prototype) {
+    const data = Reflect.getMetadata('data', target.prototype, key);
+    console.log(data);
+    // name
+    // age
+  }
 }
 
-class Teacher extends User {}
+// 执行顺序：
+// 1. 方法上的装饰器
+// 2. 类上的装饰器
+// 这样类上的装饰器才能找到，原型上的所有方法
 
-console.log(Reflect.getMetadata('data', User.prototype, 'getName')); // test
-console.log(Reflect.hasMetadata('data', User.prototype, 'getName')); // true
-console.log(Reflect.hasMetadata('data', Teacher.prototype, 'getName')); // true
-console.log(Reflect.hasOwnMetadata('data', Teacher.prototype, 'getName')); // false
-console.log(Reflect.getMetadataKeys(User.prototype, 'getName'));
-// [ 'design:returntype',
-//   'design:paramtypes',
-//   'design:type',
-//   'data1',
-//   'data' ]
-console.log(Reflect.getMetadataKeys(Teacher.prototype, 'getName'));
-// [ 'design:returntype',
-//   'design:paramtypes',
-//   'design:type',
-//   'data1',
-//   'data' ]
-// [ 'design:returntype',
-//   'design:paramtypes',
-//   'design:type',
-//   'data1',
-//   'data' ]
-console.log(Reflect.getOwnMetadataKeys(Teacher.prototype, 'getName')); // []
+// @showData
+// class User {
+//   @Reflect.metadata('data', 'test')
+//   getName() {}
+//   @Reflect.metadata('data', 'age')
+//   getAge() {}
+// }
+
+// 自己封装的好处就是可以 customize
+function setData(dataKey: string, msg: string) {
+  return function(target: User, key: string) {
+    // 在类上封装一个 key 为 data, 值为 age 的数据
+    // dataKey => data, msg => age, target => User的原型, key => getAge
+    Reflect.defineMetadata(dataKey, msg, target, key);
+  };
+}
+
+@showData
+class User {
+  @Reflect.metadata('data', 'name')
+  getName() {}
+  // same:
+  @setData('data', 'age')
+  getAge() {}
+}
